@@ -24,40 +24,39 @@
     }
 
     // Función que se ejecuta cuando el temporizador termina
-    async function onTimerFinish() {
-        try {
-            const response = await fetch(
-                `https://secure-track-db.vercel.app/computers/delete`,
-                {
-                    method: "DELETE",
-                    mode: "cors",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        token: JSON.parse(res).tokenId,
-                    }),
-                }
-            );
-            const result = await response.json();
-            let modalMessage = document.getElementById("modal-message")
-            modalMessage.innerText = `El tiempo ha terminado. Respuesta: ${result.message}`;
-            modal.style.display = "flex"; 
-        } catch (error) {
-            modalMessage.innerText = `Error: ${error.message}`;
-            modal.style.display = "flex"; 
-        }
-    }
+
 document.getElementById("close-btn").addEventListener("click", closeModal)
     function closeModal() {
         modal.style.display = "none";
     }
 
+    async function onTimerFinish(params) {
+        
+    }
 
     // Iniciar el temporizador con 5 minutos
-    window.onload = function () {
-        let fiveMinutes = 5;
-        startTimer(fiveMinutes, timerDisplay, onTimerFinish);
+    window.onload = async function () {
+      let data = await fetch("https://secure-track-db.vercel.app/computers/time",
+        {
+            method: "POST",
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                token: JSON.parse(res).tokenId,
+            }),
+        }
+      )
+        if ((await data).status === 200) {
+            let horario = await data.json();
+            console.log(horario)
+            horario = 300 - horario.time
+            startTimer(horario, timerDisplay, onTimerFinish);
+        }else{
+            let horario = await data.json();
+            time.innerText = horario
+        }
     };
     
     let img = document.createElement("img")
