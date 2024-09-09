@@ -3,7 +3,28 @@ let usuario = localStorage.getItem("userId");
 
 let libertador = { "0": [], "1": [], "2": [], "3": [] };
 let monta = { "1": [], "2": [], "3": [], "4": [], "5": [] };
-
+window.onload = async function () {
+   let data = await fetch("https://secure-track-db.vercel.app/users/status", {
+        
+            method: "POST",
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                userId:parseInt(usuario),
+            }),
+        
+    })
+    if (data.status == 200) {
+        return
+    }else if(data.status == 201){
+        const res = JSON.stringify(await data.json());
+        console.log(res)
+        localStorage.setItem("correctKey", res)
+        location.href = "../qr.html"
+    }
+};
 function showModal() {
     document.getElementById("modal").style.display = "block";
 }
