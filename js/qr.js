@@ -30,33 +30,34 @@ document.getElementById("close-btn").addEventListener("click", closeModal)
         modal.style.display = "none";
     }
 
-    async function onTimerFinish(params) {
-        
+    async function onTimer() {
+        let data = await fetch("https://secure-track-db.vercel.app/computers/time",
+            {
+                method: "POST",
+                mode: "cors",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    token: JSON.parse(res).tokenId,
+                }),
+            }
+          )
+            if ((await data).status === 200) {
+                let horario = await data.json();
+                console.log(horario)
+                horario = 300 - horario.time
+                startTimer(horario, timerDisplay, onTimer);
+            }else{
+                let horario = await data.json();
+                timer.innerText = horario
+            }
+          
     }
 
     // Iniciar el temporizador con 5 minutos
     window.onload = async function () {
-      let data = await fetch("https://secure-track-db.vercel.app/computers/time",
-        {
-            method: "POST",
-            mode: "cors",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                token: JSON.parse(res).tokenId,
-            }),
-        }
-      )
-        if ((await data).status === 200) {
-            let horario = await data.json();
-            console.log(horario)
-            horario = 300 - horario.time
-            startTimer(horario, timerDisplay, onTimerFinish);
-        }else{
-            let horario = await data.json();
-            time.innerText = horario
-        }
+        onTimer()
     };
     
     let img = document.createElement("img")
