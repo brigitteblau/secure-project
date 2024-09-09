@@ -75,7 +75,7 @@ export async function returnComputer(userId, cartId) {
 export async function getCarros() {
     // Simulación de la función getCarros
     try {
-        const response = await fetch("https://secure-track-db.vercel.app/cars");
+        const response = await fetch("https://secure-track-db.vercel.app/rooms");
         if (!response.ok) {
             throw new Error("Error al obtener carros");
         }
