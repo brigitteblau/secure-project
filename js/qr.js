@@ -1,5 +1,6 @@
     let text = document.getElementById("text")    
     let res = localStorage.getItem("correctKey")
+    const loadingScreen = document.getElementById("loadingScreen");
 
     let qr = document.getElementById("qr");
     let timerDisplay = document.getElementById("time");
@@ -31,6 +32,8 @@ document.getElementById("close-btn").addEventListener("click", closeModal)
     }
 
     async function onTimer() {
+                loadingScreen.style.display = "flex";
+
         let data = await fetch("https://secure-track-db.vercel.app/computers/time",
             {
                 method: "POST",
@@ -43,6 +46,8 @@ document.getElementById("close-btn").addEventListener("click", closeModal)
                 }),
             }
           )
+          loadingScreen.style.display = "none";
+
             if ((await data).status === 200) {
                 let horario = await data.json();
                 console.log(horario)

@@ -1,32 +1,33 @@
-import { getCarros } from "./repository.js";
-let usuario = localStorage.getItem("userId");
+import { fetchUserStatus, fetchClassrooms, requestComputer, returnComputer, getCarros } from "./repository.js";
 
+let usuario = localStorage.getItem("userId");
 let libertador = { "0": [], "1": [], "2": [], "3": [] };
 let monta = { "1": [], "2": [], "3": [], "4": [], "5": [] };
+
 window.onload = async function () {
-   let data = await fetch("https://secure-track-db.vercel.app/users/status", {
-        
-            method: "POST",
-            mode: "cors",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                userId:parseInt(usuario),
-            }),
-        
-    })
-    if (data.status == 200) {
-        return
-    }else if(data.status == 201){
-        const res = JSON.stringify(await data.json());
-        console.log(res)
-        localStorage.setItem("correctKey", res)
-        location.href = "../qr.html"
+    try {
+        if (!usuario) {
+            console.error("No hay usuario en localStorage");
+            return;
+        }
+
+        const response = await fetchUserStatus(usuario);
+        if (response.status === 200) {
+            return;
+        } else if (response.status === 201) {
+            const res = await response.json();
+            localStorage.setItem("correctKey", JSON.stringify(res));
+            location.href = "../qr.html";
+        }
+    } catch (error) {
+        console.error("Error al cargar el estado del usuario:", error);
     }
 };
-function showModal() {
-    document.getElementById("modal").style.display = "block";
+
+function showModal(message) {
+    const modal = document.getElementById("modal");
+    document.getElementById("modal-message").textContent = message;
+    modal.style.display = "block";
 }
 
 function closeModal() {
@@ -42,76 +43,43 @@ const confirmButton = document.getElementById("confirmButton");
 const returnButton = document.getElementById("returnButton");
 const loadingScreen = document.getElementById("loadingScreen");
 
-document.getElementById("monta").addEventListener("click", showMonta);
-document.getElementById("libertador").addEventListener("click", showLibertador);
+document.getElementById("monta").addEventListener("click", () => toggleBuilding("monta"));
+document.getElementById("libertador").addEventListener("click", () => toggleBuilding("libertador"));
 
-function showMonta() {
-    document.querySelector(".select-libertador").classList.add("disactive");
-    document.querySelector(".select-monta").classList.remove("disactive");
+function toggleBuilding(building) {
+    document.querySelector(".select-monta").classList.toggle("disactive", building !== "monta");
+    document.querySelector(".select-libertador").classList.toggle("disactive", building !== "libertador");
     classrooms.classList.add("disactive");
-    confirmButton.style.display = "none";
-    returnButton.style.display = "none";
+    confirmButton.classList.add("disactive");
+    returnButton.classList.add("disactive");
     classrooms.innerHTML = "";
-}
-
-function showLibertador() {
-    document.querySelector(".select-monta").classList.add("disactive");
-    document.querySelector(".select-libertador").classList.remove("disactive");
-    classrooms.classList.add("disactive");
-    confirmButton.style.display = "none";
-    returnButton.style.display = "none";
-    classrooms.innerHTML = "";
-}
-
-async function fetchClassrooms(building) {
-    try {
-        const response = await fetch(`https://secure-track-db.vercel.app/rooms`);
-        if (!response.ok) {
-            throw new Error("Error al obtener aulas");
-        }
-        const data = await response.json();
-
-        // Filtra las aulas según el edificio
-        const filteredData = data.filter(room => room.roomNumber.startsWith(building === "monta" ? "M" : "L"));
-        return filteredData;
-    } catch (error) {
-        console.error("Error al realizar el fetch:", error);
-        return [];
-    }
 }
 
 async function updateClassroomsOptions(piso, edificio) {
-    let options = [];
-    if (edificio === "monta") {
-        options = monta[piso] || [];
-    } else if (edificio === "libertador") {
-        options = libertador[piso] || [];
-    }
+    const options = edificio === "monta" ? monta[piso] : libertador[piso];
 
     classrooms.innerHTML = "";
 
-    let classroomOption = document.createElement("option");
+    const classroomOption = document.createElement("option");
     classroomOption.textContent = "Selecciona un aula";
     classroomOption.disabled = true;
     classroomOption.selected = true;
     classrooms.appendChild(classroomOption);
 
     options.forEach(room => {
-        let opt = document.createElement("option");
+        const opt = document.createElement("option");
         opt.value = room.id;
         opt.textContent = room.roomNumber;
         classrooms.appendChild(opt);
     });
 
-    if (options.length > 0) {
-        classrooms.classList.remove("disactive");
-        confirmButton.style.display = "block";
-        returnButton.style.display = "block";
-    } else {
-        classrooms.classList.add("disactive");
-        confirmButton.style.display = "none";
-        returnButton.style.display = "none";
-        showModal();
+    const isActive = options.length > 0;
+    classrooms.classList.toggle("disactive", !isActive);
+    confirmButton.classList.toggle("disactive", !isActive);
+    returnButton.classList.toggle("disactive", !isActive);
+
+    if (!isActive) {
+        showModal("No hay aulas disponibles en este piso, por favor seleccione otra.");
     }
 }
 
@@ -131,122 +99,32 @@ classrooms.addEventListener("change", checkAllSelected);
 
 function checkAllSelected() {
     const selectedClassroom = classrooms.value;
-    if (selectedClassroom) {
-        confirmButton.style.display = "block";
-        returnButton.style.display = "block";
-    } else {
-        confirmButton.style.display = "none";
-        returnButton.style.display = "none";
-    }
+    confirmButton.disabled = !selectedClassroom;
+    returnButton.disabled = !selectedClassroom;
 }
 
-confirmButton.addEventListener("click", () => requestComputer());
-returnButton.addEventListener("click", () => returnComputer());
-
-async function requestComputer() {
-    console.log(
-        JSON.stringify({
-            userId: usuario,
-            cartId: parseInt(classrooms.value),
-        })
-    );
-    const response = await fetch(
-        `https://secure-track-db.vercel.app/computers/request`,
-        {
-            method: "POST",
-            mode: "cors",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                userId: usuario,
-                cartId: parseInt(classrooms.value),
-            }),
-        }
-    );
-
-    const res = JSON.stringify(await response.json());
-    if (response.status == 200) {
-        localStorage.setItem("correctKey", res);
-        location.href = "../qr.html";
-    }
-}
-
-async function returnComputer() {
-    // Lógica de devolución de computadora
-    console.log(
-        JSON.stringify({
-            userId: usuario,
-            cartId: parseInt(classrooms.value),
-        })
-    );
-    const response = await fetch(
-        `https://secure-track-db.vercel.app/computers/request-return`,
-        {
-            method: "POST",
-            mode: "cors",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                userId: usuario,
-                cartId: parseInt(classrooms.value),
-            }),
-        }
-    );
-
-    const res = JSON.stringify(await response.json());
-    if (response.status == 200) {
-        localStorage.setItem("correctKey", res);
-        location.href = "../qr.html";
-    }
-}
-
-async function initializeClassrooms() {
+confirmButton.addEventListener("click", async () => {
     try {
-        // Mostrar la pantalla de carga
-        loadingScreen.style.display = "flex";
-
-        const data = await getCarros();
-        console.log("Datos recibidos del backend:", data);
-
-        // Limpia las estructuras antes de poblarlas
-        for (let key in libertador) libertador[key] = [];
-        for (let key in monta) monta[key] = [];
-
-        data.forEach((item) => {
-            const roomNumber = item.roomNumber; // Ej: "L001", "M002"
-            const building = roomNumber[0]; // "L" o "M"
-            
-            // Extraemos el número de piso considerando que puede haber más de un dígito
-            const floor = roomNumber.slice(1, 2); // Para casos más complejos, ajustar este slice
-
-            // Verificamos y asignamos las aulas al edificio y piso correctos
-            if (building === "M") {
-                if (!monta[floor]) {
-                    monta[floor] = []; // Inicializamos el piso si no existe
-                }
-                monta[floor].push(item); // Asignamos el aula al piso correspondiente
-            } else if (building === "L") {
-                if (!libertador[floor]) {
-                    libertador[floor] = []; // Inicializamos el piso si no existe
-                }
-                libertador[floor].push(item); // Asignamos el aula al piso correspondiente
-            } else {
-                console.warn(`Piso no esperado: ${floor} para el edificio ${building}`);
-            }
-        });
-
-        console.log("Aulas de Montañeses:", monta);
-        console.log("Aulas de Libertador:", libertador);
-
+        loadingScreen.style.display = "block";
+        await requestComputer(usuario, classrooms.value);
+        alert("Retiro de computadora registrado con éxito");
     } catch (error) {
-        console.error("Error al inicializar las aulas:", error);
+        console.error("Error en el retiro de computadora:", error);
     } finally {
-        // Ocultar la pantalla de carga
         loadingScreen.style.display = "none";
     }
-}
+});
 
+returnButton.addEventListener("click", async () => {
+    try {
+        loadingScreen.style.display = "block";
+        await returnComputer(usuario, classrooms.value);
+        alert("Devolución de computadora registrada con éxito");
+    } catch (error) {
+        console.error("Error en la devolución de computadora:", error);
+    } finally {
+        loadingScreen.style.display = "none";
+    }
+});
 
-initializeClassrooms();
+getCarros();
