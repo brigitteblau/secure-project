@@ -217,13 +217,21 @@ async function initializeClassrooms() {
         data.forEach((item) => {
             const roomNumber = item.roomNumber; // Ej: "L001", "M002"
             const building = roomNumber[0]; // "L" o "M"
-            const floor = roomNumber.slice(1, 2); // Extraer solo el primer dígito del piso (e.g., "1", "2", etc.)
+            
+            // Extraemos el número de piso considerando que puede haber más de un dígito
+            const floor = roomNumber.slice(1, 2); // Para casos más complejos, ajustar este slice
 
-            // Asigna las aulas al edificio y piso correctos
-            if (building === "M" && monta[floor] !== undefined) {
-                monta[floor].push(item);
-            } else if (building === "L" && libertador[floor] !== undefined) {
-                libertador[floor].push(item);
+            // Verificamos y asignamos las aulas al edificio y piso correctos
+            if (building === "M") {
+                if (!monta[floor]) {
+                    monta[floor] = []; // Inicializamos el piso si no existe
+                }
+                monta[floor].push(item); // Asignamos el aula al piso correspondiente
+            } else if (building === "L") {
+                if (!libertador[floor]) {
+                    libertador[floor] = []; // Inicializamos el piso si no existe
+                }
+                libertador[floor].push(item); // Asignamos el aula al piso correspondiente
             } else {
                 console.warn(`Piso no esperado: ${floor} para el edificio ${building}`);
             }
@@ -239,5 +247,6 @@ async function initializeClassrooms() {
         loadingScreen.style.display = "none";
     }
 }
+
 
 initializeClassrooms();
