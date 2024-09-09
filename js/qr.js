@@ -47,10 +47,15 @@ document.getElementById("close-btn").addEventListener("click", closeModal)
                 let horario = await data.json();
                 console.log(horario)
                 horario = 300 - horario.time
-                startTimer(horario, timerDisplay, onTimer);
-            }else{
+                startTimer(horario, timerDisplay, ()=>{onTimer(); location.href = "../selectorItems.html"});
+            }else if ((await data).status === 201) {
+                
+            
                 let horario = await data.json();
                 timer.innerText = horario
+                
+            }else{
+                location.href = "../selectorItems.html"
             }
           
     }
