@@ -15,7 +15,7 @@
             seconds = seconds < 10 ? "0" + seconds : seconds;
 
             display.textContent = minutes + ":" + seconds;
-
+            
             if (--timer < 0) {
                 clearInterval(interval);
                 callback(); // Ejecutar la función cuando el tiempo llegue a 0

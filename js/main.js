@@ -37,6 +37,13 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
+window.onload = async function isloged() {
+    if (localStorage.getItem("userId")) {
+        location.href = "../selectorItems.html"
+    }else{
+        return
+    }
+}
 
 async function register_user(user) {
     try {
