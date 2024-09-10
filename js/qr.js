@@ -1,6 +1,8 @@
     let text = document.getElementById("text")    
     let res = sessionStorage.getItem("correctKey")
     const loadingScreen = document.getElementById("loadingScreen");
+    let usuario = sessionStorage.getItem("userId");
+
 
     let qr = document.getElementById("qr");
     let timerDisplay = document.getElementById("time");
@@ -67,6 +69,9 @@ document.getElementById("close-btn").addEventListener("click", closeModal)
 
     // Iniciar el temporizador con 5 minutos
     window.onload = async function () {
+        if (!usuario) {
+            location.href = "../user.html"
+        }
         onTimer()
     };
     

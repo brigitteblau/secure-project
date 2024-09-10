@@ -6,6 +6,9 @@ let libertador = { "0": [], "1": [], "2": [], "3": [] };
 let monta = { "1": [], "2": [], "3": [], "4": [], "5": [] };
 
 window.onload = async function () {
+    if (!usuario) {
+        location.href = "../user.html"
+    }
     try {
         const response = await fetchUserStatus(usuario);
         if (response.status === 200) {
