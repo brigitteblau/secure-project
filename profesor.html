@@ -43,7 +43,7 @@
     </footer>
     <script src="js/main.js"></script>
     <script>
-        if (!localStorage.getItem("Prof-Key")) {
+        if (!sessionStorage.getItem("Prof-Key")) {
     alert("Acceso denegado");
     window.location.href = "index.html";
 }

@@ -1,6 +1,6 @@
 import { fetchUserStatus, fetchClassrooms, requestComputer, returnComputer, getCarros } from "./repository.js";
 
-let usuario = localStorage.getItem("userId");
+let usuario = sessionStorage.getItem("userId");
 
 let libertador = { "0": [], "1": [], "2": [], "3": [] };
 let monta = { "1": [], "2": [], "3": [], "4": [], "5": [] };
@@ -13,7 +13,7 @@ window.onload = async function () {
         } else if (response.status === 201) {
             const res = JSON.stringify(await response.json());
             console.log(res);
-            localStorage.setItem("correctKey", res);
+            sessionStorage.setItem("correctKey", res);
             location.href = "../qr.html";
         }
     } catch (error) {
@@ -127,7 +127,7 @@ async function handleRequestComputer() {
         const response = await requestComputer(usuario, classrooms.value);
         const res = JSON.stringify(await response.json());
         if (response.status == 200) {
-            localStorage.setItem("correctKey", res);
+            sessionStorage.setItem("correctKey", res);
             location.href = "../qr.html";
         }
     } catch (error) {
@@ -140,7 +140,7 @@ async function handleReturnComputer() {
         const response = await returnComputer(usuario, classrooms.value);
         const res = JSON.stringify(await response.json());
         if (response.status == 200) {
-            localStorage.setItem("correctKey", res);
+            sessionStorage.setItem("correctKey", res);
             location.href = "../qr.html";
         }
     } catch (error) {

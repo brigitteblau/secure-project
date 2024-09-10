@@ -58,7 +58,7 @@
     </footer>
     <script src="js/main.js"></script>
     <script>
-        if (!localStorage.getItem("asist-Key")) {
+        if (!sessionStorage.getItem("asist-Key")) {
             alert("Acceso denegado");
             window.location.href = "index.html";
         }

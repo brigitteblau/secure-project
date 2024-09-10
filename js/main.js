@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 window.onload = async function isloged() {
-    if (localStorage.getItem("userId")) {
+    if (sessionStorage.getItem("userId")) {
         location.href = "../selectorItems.html"
     }else{
         return
@@ -57,7 +57,7 @@ async function register_user(user) {
         let data = await response.json()
         console.log(data);
         if (response.status === 200) {
-            localStorage.setItem("userId", data.id)
+            sessionStorage.setItem("userId", data.id)
             location.href = "../selectorItems.html"
         }
     } catch (error) {
@@ -77,14 +77,14 @@ async function logueo_user(user) {
         let data = await response.json();
         console.log(data);
         if (data.occupation === "Estudiante") {
-              localStorage.setItem("userId", data.id)
+              sessionStorage.setItem("userId", data.id)
             location.href = "../selectorItems.html"
 
         } else if (data.occupation === "Asistente") {
-              localStorage.setItem("userId", data.id)
+              sessionStorage.setItem("userId", data.id)
             location.href = "../asistente.html"
         } else if(data.occupation === "Profesor") {
-              localStorage.setItem("userId", data.id)
+              sessionStorage.setItem("userId", data.id)
             location.href = "../profesor.html"
         }
     } catch (error) {

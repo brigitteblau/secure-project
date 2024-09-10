@@ -1,5 +1,5 @@
     let text = document.getElementById("text")    
-    let res = localStorage.getItem("correctKey")
+    let res = sessionStorage.getItem("correctKey")
     const loadingScreen = document.getElementById("loadingScreen");
 
     let qr = document.getElementById("qr");
