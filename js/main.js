@@ -51,7 +51,7 @@ function showTab(tabId) {
             return;
         }
 
-        sessionStorage.setItem("username", username); // Guardar el username correctamente
+        sessionStorage.setItem("username", username); 
         logueo_user({ username: username, password: password });
     });
 
@@ -67,7 +67,7 @@ function showTab(tabId) {
             return;
         }
 
-        sessionStorage.setItem("dni", dni); // Asegúrate de usar "dni" en minúsculas
+        sessionStorage.setItem("dni", dni); 
         register_user({ username: dni, password: password, avatar: avatarSelect.value });
     });
 
@@ -85,7 +85,9 @@ function showTab(tabId) {
             if (response.status === 200) {
                 showSuccess("Registro exitoso. Redirigiendo...");
                 sessionStorage.setItem("userId", data.id);
+                sessionStorage.setItem("occupation", "Estudiante");
                 sessionStorage.setItem("profilePhoto", data.avatar);
+               
                 setTimeout(() => {
                     location.href = "../selectorItems.html";
                 }, 2000);
@@ -120,8 +122,9 @@ function showTab(tabId) {
                 sessionStorage.setItem("userId", data.id);
                 sessionStorage.setItem("occupation", data.occupation)
                 sessionStorage.setItem("profilePhoto", data.avatar);
+                sessionStorage.setItem("status", data.status);
                 console.log(data.avatar)
-                setTimeout(() => {
+                
                     if (data.occupation === "Estudiante") {
                         location.href = "../selectorItems.html";
                     } else if (data.occupation === "Asistente") {
@@ -129,7 +132,7 @@ function showTab(tabId) {
                     } else if (data.occupation === "Profesor") {
                         location.href = "../selectorItems.html";
                     }
-                }, 2000);
+              
             } else {
                 showError(data.message || "Usuario o contraseña incorrectos.");
             }
@@ -138,3 +141,22 @@ function showTab(tabId) {
         }
     }
 
+
+
+//     let crear = document.getElementById("crear")
+//     crear.addEventListener("click", nfc)
+// async function name(params) {
+//     let data = await fetch("https://secure-track-db.vercel.app/qr/nfc",
+//         {
+//             method: "POST",
+//             mode: "cors",
+//             headers: {
+//                 "Content-Type": "application/json",
+//             },
+//             body: JSON.stringify({
+//                 token: JSON.parse(res).tokenId,
+//             }),
+//         }
+// location.href="./qr.html"
+//         ) 
+// }
